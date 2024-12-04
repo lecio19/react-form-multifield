@@ -1,90 +1,175 @@
 import { useState } from "react";
 import style from "./components/card.module.css";
-import posts from "./components/posts";
+import Posts from "./components/posts";
 
+const PostsData = {
+    title: "",
+    image: "",
+    content: "",
+    published: false,
+    categories: ""
+  };
 
 export default function Card() {
-    const [title, setTitle] = useState('');
-    const [tag, setTags] = useState('')
-    const [posts, setPosts] = useState(Posts); 
+    const [posts, setPosts] = useState(Posts);
+    const [formData, setFormData] = useState(PostsData);
+ 
     
     const publishedPosts = posts.filter((post) => post.published);
+
+    function handleFormData(event) {
+        const key = event.target.name;
+        const value =
+          event.target.type === "checkbox" ? event.target.checked : event.target.value;
+    
+          const newFormData = {
+          ...formData,
+          [key]: value,
+        };
+    
+        console.log(newFormData)
+    
+        setFormData(newFormData);
+      }
     
     function addPost(event) {
         event.preventDefault();
     
-        const newTitle = title.trim();
-        if (newTitle === '') return;
+        const newTitle = formData.title.trim();
+        // const newTags = formData.tags.trim();
     
-        const newTags = tag
-        .trim()
-        .toLocaleUpperCase()
-        .split('-')
-
-        if (newTags === '') return;
-
+        console.log("BEFORE TRIM")
+    
+        //if (newTitle === "" || newTags.length === 0) return;
+    
+        console.log("AFTER TRIM")
+    
         const addedPost = {
-          title: newTitle,
-          image: kinderpinguìsrc,
-          content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit animi unde quasi enim non esse ratione voluptas voluptate, officiis veritatis magni blanditiis possimus nobis cum id inventore corporis deserunt hic.Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit animi unde quasi enim non esse ratione voluptas voluptate, officiis veritatis magni blanditiis possimus nobis cum id inventore corporis deserunt hic.',
-          tags: newTags,
-          published: true,
-        };
-       
-        console.log(addedPost)
+            title: newTitle,
+            image: formData.image || "https://img.freepik.com/vettori-premium/vettore-dell-icona-dell-immagine-predefinita-pagina-immagine-mancante-per-il-design-del-sito-web-o-l-app-mobile-nessuna-foto-disponibile_87543-7509.jpg",
+            content: formData.content || "Contenuto non disponibile.",
+            // tags: newTags,
+            published: formData.published,
+            categories: formData.categories
+          };
+
+          setPosts([...posts, addedPost]);
+          setFormData(PostsData);
+        }
+          
+        function deletePost(id) {
+            const updatedPosts = posts.filter((post) => post.id !== id);
+            setPosts(updatedPosts);
+        }
+        
     
-        setPosts([...posts, addedPost]);
-        setTags([])
-        setTitle('');
-        console.log('Post aggiunto!');
-    }
   return (
-    <>
        <main className={style.background}>
         {/* FORM */}
         <div className={style.formContainer}>
-          <form onSubmit={addPost} action="">
+          <form onSubmit={addPost} classname={style.formContainer}>
 
             {/* TITOLO */}
-            <input
-              type="text"
-              onChange={(event) => setTitle(event.target.value)}
-              value={title}
-              placeholder="Inserisci il titolo del post"
-              className={style.newPost}
-            />
-          
-              {/* TAG */}
+            <div>
+              <label htmlFor="title"></label>
               <input
-              type="text"
-              onChange={(event) => setTags(event.target.value)}
-              value={tag}
-              placeholder="Inserisci Tags"
-              className={style.newPost}
+                id="title"
+                name="title"
+                onChange={handleFormData}
+                value={formData.title}
+                type="text"
+                placeholder="Titolo del post"
+              />
+            </div>
+             
+            {/* CONTENUTO */}
+            <div>
+                <label htmlFor="contenuto"></label>
+                <input
+                   id="content"
+                   name="content"
+                   onChange={handleFormData}
+                   value={formData.content}
+                   type="text"
+                   placeholder="Inserisci il contenuto"
+                />
+            </div>
+
+            {/* IMMAGINE */}
+            <div>
+              <label htmlFor="img"></label>
+                 <input
+                 id="image"
+                 name="image"
+                 onChange={handleFormData}
+                 value={formData.image}
+                 type="text"
+                 placeholder="Inserisci il link"
+                />
+            </div>
+            {/* CATEGORIA */}
+            <div>
+              <label htmlFor="categories"></label>
+              <select  id="published"
+                 name="categories"
+                 onChange={handleFormData}
+                 value={formData.categories}
+                 type="select"
+                 placeholder="Inserisci il contenuto"> 
+              <option value="" disabled>Seleziona una categoria</option>
+              <option value='tech'>Tech</option>
+              <option value='programmazione'>Programmazione</option>
+              </select>
+            </div>
+            {/* PUBBLICARE */}
+            <div>
+              <label htmlFor="pubblicare">Spunta per Pubblicare</label>
+              <input
+                id="published"
+                name="published"
+                onChange={handleFormData}
+                checked={formData.published}
+                type="checkbox"
+               />
+            </div>
+
+            <input
+               type="submit"
+               value="Aggiungi"
+               className={style.submitButton}
             />
+            </form>
+            </div>
 
-            <input type="submit" value="Aggiungi" className={style.submitButton} />
-          </form>
-        </div>
 
-        {/* CARD */}
-        <div className={style.container}>
-          {publishedPosts.length > 0
-            ? publishedPosts.map((post) => (
-                <div key={post.id} className={style.cardbody}>
-                  <img src={post.image || '/path-to-default-image.jpg'} alt={post.title || 'Post'} />
-                  <h3>
-                    {post.title} {post.id}
-                  </h3>
-                  <h5 style={{ color: post.tags.includes("html") ? "red" : "blue" }}>
-                    Tag: {post.tags}
-                  </h5>
-                  <p>Contenuto: {post.content}</p>
-                </div>
-              ))
-            : <p>Nessun post pubblicato.</p>}
-        </div>
-      </main>
-    </>
-  );
-}
+            {/* CARD */}
+            <div className={style.container}>
+              {publishedPosts.length > 0
+              ? publishedPosts.map((post) => (
+                  <div key={post.id} className={style.cardbody}>
+                      <img src={post.image || '/path-to-default-image.jpg'} alt={post.title || 'Post'} />
+                      <h3>
+                         {post.title}
+                      </h3>
+                      <p>Contenuto: {post.content}</p>
+                      <h5>Categoria: {post.categories}</h5>
+                  <div>
+                      <button
+                          className={style.submitButton}
+                          onClick={() => deletePost(post.id)}
+                      >
+                          Elimina Post
+                      </button>
+                  </div>
+              </div>
+          ))
+         : (
+          <p>Nessun post pubblicato.</p>
+        )}
+      </div>
+    </main>
+   );
+} 
+        
+                
+  

@@ -41,6 +41,17 @@
     
   }
 
+  .formContainer input{
+    border: none;
+    padding: 10px;
+  
+  }
+
+  select{
+    border: none;
+    padding: 8px;
+  }
+
   .newPost{
     border: none;
     padding: 10px;
